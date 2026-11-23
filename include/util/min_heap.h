@@ -94,9 +94,24 @@ private:
     std::vector<T> data_;
     Less           less_;
 
+    void sift_up(std::size_t i) {
+
+        // Sift the element at index i up the heap until the heap property is restored
+        while (i > 0) {
+            std::size_t parent = (i - 1) / 2;
+            if (!less_(data_[i], data_[parent])) {
+                break; // Heap property satisfied
+            }
+            std::swap(data_[i], data_[parent]);
+            i = parent;
+        }
+    }
+
     void sift_down(std::size_t i) {
         std::size_t n = data_.size();
         while (true) {
+
+            // Calculate the indices of the left and right children
             std::size_t left = 2 * i + 1;
             std::size_t right = 2 * i + 2;
             std::size_t smallest = i;
