@@ -218,3 +218,27 @@ TEST(lru_capacity_one) {
     CHECK(c.contains("b"));
     CHECK_EQ(c.stats().evictions, std::size_t{1});
 }
+
+TEST(lru_erase_node) {
+    LruCache<std::string, int> c(4);
+    c.put("a", 1);
+    c.put("b", 2);
+    c.put("c", 3);
+    c.put("d", 4);
+
+    REQUIRE(c.erase("c"));
+    CHECK_EQ(c.keys_mru_to_lru(), (std::vector<std::string>{"d", "b", "a"}));
+    CHECK(!c.contains("c"));
+
+    REQUIRE(c.erase("d"));
+    CHECK_EQ(c.keys_mru_to_lru(), (std::vector<std::string>{"b", "a"}));
+
+    REQUIRE(c.erase("a"));
+    CHECK_EQ(c.keys_mru_to_lru(), (std::vector<std::string>{"b"}));
+
+    REQUIRE(c.erase("b"));
+    CHECK(c.keys_mru_to_lru().empty());
+    CHECK_EQ(c.size(), std::size_t{0});
+    CHECK(!c.erase("b"));
+    CHECK_EQ(c.stats().evictions, std::size_t{0});
+}
