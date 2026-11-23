@@ -199,3 +199,22 @@ TEST(index_ranking_and_ties) {
 // =========================================================================
 
 int main(int argc, char** argv) { return mt::run_all(argc, argv); }
+
+TEST(lru_zero_capacity) {
+    LruCache<std::string, int> c(0);
+    c.put("a", 1);
+    CHECK(!c.contains("a"));
+    CHECK_EQ(c.stats().evictions, std::size_t{0});
+}
+
+
+// TEST (3) cases for lru_cache with capacity 1
+TEST(lru_capacity_one) {
+    LruCache<std::string, int> c(1);
+    c.put("a", 1);
+    CHECK(c.contains("a"));
+    c.put("b", 2);
+    CHECK(!c.contains("a"));
+    CHECK(c.contains("b"));
+    CHECK_EQ(c.stats().evictions, std::size_t{1});
+}
