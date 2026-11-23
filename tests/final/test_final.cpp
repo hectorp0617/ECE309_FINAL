@@ -59,6 +59,11 @@ TEST(heap_pops_in_order) {
     CHECK_EQ(got, (std::vector<int>{1, 1, 3, 4, 5}));
 }
 
+TEST(heap_top_k_returns_largest) {
+    const std::vector<int> items{5, 1, 9, 3, 7};
+    CHECK_EQ(top_k(items, 2), (std::vector<int>{9, 7}));
+}
+
 // Example 2 (lru): the least recently USED entry is evicted, and get()
 // counts as a use.
 TEST(lru_evicts_least_recently_used) {

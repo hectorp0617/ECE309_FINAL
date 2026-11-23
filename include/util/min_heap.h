@@ -139,22 +139,33 @@ private:
 // space. Items that compare equal may come out in any order.
 template <typename T, typename Less = std::less<T>>
 std::vector<T> top_k(const std::vector<T>& items, std::size_t k, Less less = Less()) {
-    // TODO: keep a MinHeap<T, Less> of at most k items. For each item: if
-    // the heap has fewer than k items, push it; otherwise, if the heap's top
-    // is less than the item, pop the top and push the item. At the end, pop
-    // everything (smallest first) and return it reversed.
-    //
-    // Clues:
-    //  * k == 0: return {} BEFORE the loop (top() on an empty heap throws).
-    //  * Build the heap WITH the comparator:  MinHeap<T, Less> heap(less);
-    //    Writing  MinHeap<T, Less> heap;  fails for lambdas ("use of deleted
-    //    function ... lambda") because a lambda can't be default-constructed.
-    //  * "top is less than the item" means  less(heap.top(), item),  not
-    //    heap.top() < item.  Read less(a, b) as "a is WORSE than b": the heap
-    //    keeps the k best items with the worst of them on top.
-    //  * std::reverse (from <algorithm>) flips a vector.
-    (void)items;
-    (void)k;
-    (void)less;
-    return {};
+    // Handle if emtpty or k is 0
+    if (k == 0 || items.empty()) {
+        return {};
+    }
+
+    MinHeap<T, Less> heap(less);
+
+
+    // Iterate through each item in the input vector
+    for (const auto& item : items) {
+        if (heap.size() < k) {
+            heap.push(item);
+        } else if (k > 0 && less(heap.top(), item)) {   // Check if the current item is larger than the smallest in the heap
+            heap.pop();
+            heap.push(item);
+        }
+    }
+
+    std::vector<T> result;
+
+    // Pop all elements from the heap and store them in the result vector
+    while (!heap.empty()) {
+        result.push_back(heap.pop());
+    }
+
+    // Reverse the result to get the items in descending order
+    std::reverse(result.begin(), result.end());
+
+    return result;
 }
